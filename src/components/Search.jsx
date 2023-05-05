@@ -1,54 +1,38 @@
-import React, { useContext, useState } from "react";
-import {
-    collection,
-    query,
-    where,
-    getDocs,
-    setDoc,
-    doc,
-    updateDoc,
-    serverTimestamp,
-    getDoc,
-} from "firebase/firestore";
-import { db } from "../firebase";
-import {collection, getDocs, query, where} from "firebase/firestore";
+import React, { useContext, useState } from "react"
+import { collection, query, where, getDocs, setDoc, doc, updateDoc, serverTimestamp, getDoc } from "firebase/firestore"
+import { db } from "../firebase"
+import { collection, getDocs, query, where } from "firebase/firestore"
 
 const Search = () => {
-    const [username, setUsername] = useState("");
-    const [user, setUser] = useState(null);
-    const [err, setErr] = useState(false);
+    const [username, setUsername] = useState("")
+    const [user, setUser] = useState(null)
+    const [err, setErr] = useState(false)
 
     const handleSearch = async () => {
-        const q = query(
-            collection(db, "users"),
-            where("displayName", "==", username)
-        );
+        const q = query(collection(db, "users"), where("displayName", "==", username))
 
         try {
-            const querySnapshot = await getDocs(q);
+            const querySnapshot = await getDocs(q)
             querySnapshot.forEach((doc) => {
-                setUser(doc.data());
-            });
+                setUser(doc.data())
+            })
         } catch (err) {
-            setErr(true);
+            setErr(true)
         }
-    };
+    }
 
     const handleKey = (e) => {
-        e.code === "Enter" && handleSearch();
-    };
+        e.code === "Enter" && handleSearch()
+    }
     const handleSelect = async () => {
         //check whether the group(chats in firestore) exists, if not create
-        const combinedId =
-            currentUser.uid > user.uid
-                ? currentUser.uid + user.uid
-                : user.uid + currentUser.uid;
+        const combinedId = currentUser.uid > user.uid ? currentUser.uid + user.uid : user.uid + currentUser.uid
         try {
-            const res = await getDoc(doc(db, "chats", combinedId));
+            const res = await getDoc(doc(db, "chats", combinedId))
 
             if (!res.exists()) {
                 //create a chat in chats collection
-                await setDoc(doc(db, "chats", combinedId), { messages: [] });
+                await setDoc(doc(db, "chats", combinedId), { messages: [] })
 
                 //create user chats
                 await updateDoc(doc(db, "userChats", currentUser.uid), {
@@ -58,7 +42,7 @@ const Search = () => {
                         photoURL: user.photoURL,
                     },
                     [combinedId + ".date"]: serverTimestamp(),
-                });
+                })
 
                 await updateDoc(doc(db, "userChats", user.uid), {
                     [combinedId + ".userInfo"]: {
@@ -67,32 +51,35 @@ const Search = () => {
                         photoURL: currentUser.photoURL,
                     },
                     [combinedId + ".date"]: serverTimestamp(),
-                });
+                })
             }
         } catch (err) {}
 
-        setUser(null);
+        setUser(null)
         setUsername("")
-    };
-    return(
-      <div className='search'>
+    }
+    return (
+        <div className="search">
             <div className="searchForm">
-                <input type="text" placeholder="tìm kiếm người dùng"
-                       onKeyDown={handleKey}
-                       onChange={(e) => setUsername(e.target.value)}
-                       value={username}/>
+                <input
+                    type="text"
+                    placeholder="tìm kiếm người dùng"
+                    onKeyDown={handleKey}
+                    onChange={(e) => setUsername(e.target.value)}
+                    value={username}
+                />
             </div>
-          {err && <span>Không tìm thấy người dùng!</span>}
-          {user && (
-            <div className="userChat">
-                <img src={user.photoURL} alt=""/>
-                <div className="userChatInfo">
-                    <span>{user.displayName}</span>
+            {err && <span>Không tìm thấy người dùng!</span>}
+            {user && (
+                <div className="userChat" onClick={handleSelect}>
+                    <img src={user.photoURL} alt="" />
+                    <div className="userChatInfo">
+                        <span>{user.displayName}</span>
+                    </div>
                 </div>
-            </div>
-          )}
-      </div>
-  );
-};
+            )}
+        </div>
+    )
+}
 
-export default Search;
+export default Search
