@@ -84,6 +84,17 @@
       font-size: 12px;
       margin-top: 10px;
     }
+    .forgotPassword{
+      
+        display: flex; /* Sử dụng flexbox */
+        justify-content: center; /* Căn chỉnh theo chiều ngang */
+        align-items: center; /* Căn chỉnh theo chiều dọc */
+        text-align: center; /* Căn giữa nội dung văn bản */
+        margin-top: 20px; /* Căn chỉnh vị trí dọc */
+        color: #5d5b8d;
+        font-size: 12px;
+        margin-top: 10px;
+    }
   }
 }
 
